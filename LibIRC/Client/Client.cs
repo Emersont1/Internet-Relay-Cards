@@ -16,7 +16,7 @@ namespace LibIRC {
         private TcpClient connection;
         private Stream stream;
         private StreamReader reader;
-        
+
         private Config config;
         private Dictionary<String, Channel> Channels;
 
@@ -56,8 +56,8 @@ namespace LibIRC {
             // Initialise regex BEFORE we connect
             // Nicks May Contain: 0-9A-Za-z_\-\[\]\{\}\\`\|
             // Server May Contain A-Za-z.\-
-            ServerMessageRegex = new System.Text.RegularExpressions.Regex(@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
-            PrivateMessageRegex = new System.Text.RegularExpressions.Regex(@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
+            ServerMessageRegex = new System.Text.RegularExpressions.Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
+            PrivateMessageRegex = new System.Text.RegularExpressions.Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
 
             connection = new TcpClient (config.Host, config.Port);
             stream = connection.GetStream ();
@@ -73,7 +73,6 @@ namespace LibIRC {
             thread = new Thread ((ThreadStart) delegate { this.BackThread (); });
             thread.Start ();
             Channels = new Dictionary<string, Channel> ();
-
 
         }
 
@@ -94,6 +93,11 @@ namespace LibIRC {
 
         }
 
+        /// <summary>
+        /// Joins A channel
+        /// /// </summary>
+        /// <param name="ChannelName">The Name of the Channel To Join</param>
+        /// <returns>A Channel Object for the Channel</returns>
         public Channel Join (String ChannelName) {
             if (!Channels.ContainsKey (ChannelName)) {
                 Channel channel = new Channel (this, ChannelName);

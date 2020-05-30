@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 
 namespace LibIRC {
-     /// <summary>
+    /// <summary>
     /// A Class to wrap a class in a threadsafe way with a mutex
     /// </summary>
     /// <typeparam name="T">The type of class to be wrapped</typeparam>

@@ -1,8 +1,8 @@
 using System;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace LibIRC {
@@ -15,15 +15,15 @@ namespace LibIRC {
                 SendData (payload);
                 return; // no further processing required
             }
-            Match server = ServerMessageRegex.Match(Line);
-            Match priv = PrivateMessageRegex.Match(Line);
-            if(server.Success){
+            Match server = ServerMessageRegex.Match (Line);
+            Match priv = PrivateMessageRegex.Match (Line);
+            if (server.Success) {
                 Console.WriteLine ("Server Message");
 
-            }else if(priv.Success){
-                Console.WriteLine("Channel Message");
-            } else{
-                Console.WriteLine("Unknown Message Type");
+            } else if (priv.Success) {
+                Console.WriteLine ("Channel Message");
+            } else {
+                Console.WriteLine ("Unknown Message Type");
             }
         }
     }

@@ -15,16 +15,16 @@ namespace connection {
             config.QuitMessage = "Test Shutdown";
 
             Client c = new Client (config);
-            Client.Channel chan = c.Join("#test");
-            while(true){
-                String Line = Console.ReadLine();
-                if(Line=="QUIT")
-                break;
+            Client.Channel chan = c.Join ("#test");
+            while (true) {
+                String Line = Console.ReadLine ();
+                if (Line == "QUIT")
+                    break;
                 else
-                chan.SendMessage(Line);
+                    chan.SendMessage (Line);
 
             }
-            c.Quit();
+            c.Quit ();
             Console.WriteLine (config.ToJson ());
         }
     }

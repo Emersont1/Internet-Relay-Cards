@@ -17,10 +17,15 @@ namespace LibIRC {
             /// </summary>
             public String ChannelName { get; private set; }
 
-            public Channel (Client parent, String ChannelName) {
+            internal Channel (Client parent, String ChannelName) {
                 this.ChannelName = ChannelName;
                 this.parent = parent;
             }
+
+            /// <summary>
+            /// Sends a Message to the Channel
+            /// </summary>
+            /// <param name="message">The Message To send</param>
             public void SendMessage (String message) {
                 parent.SendData (String.Format ("PRIVMSG {0} :{1}", ChannelName, message));
             }
