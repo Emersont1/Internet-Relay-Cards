@@ -14,17 +14,17 @@ namespace connection {
             config.Port = 6667;
             config.QuitMessage = "Test Shutdown";
 
-            Client c = new Client (config);
-            Client.Channel chan = c.Join ("#test");
+            Client client = new Client (config);
+            Client.Channel channel = client.Join ("#test");
             while (true) {
                 String Line = Console.ReadLine ();
                 if (Line == "QUIT")
                     break;
                 else
-                    chan.SendMessage (Line);
+                    channel.SendMessage (Line);
 
             }
-            c.Quit ();
+            client.Quit ();
             Console.WriteLine (config.ToJson ());
         }
     }

@@ -13,17 +13,17 @@ namespace LibIRC {
     public partial class Client {
 
         // WebStream
-        private TcpClient connection;
-        private Stream stream;
-        private StreamReader reader;
+        private TcpClient Connection;
+        private Stream NetStream;
+        private StreamReader Reader;
 
-        private Config config;
+        private Config Configuration;
         private Dictionary<String, Channel> Channels;
 
         // Threading
         private ThreadSafeStruct<bool> ShouldClose;
         private ThreadSafeObject<Queue<String>> CommandQueue;
-        private Thread thread;
+        private Thread NetThread;
 
         // Regex
         Regex ServerMessageRegex;
@@ -32,18 +32,18 @@ namespace LibIRC {
         private void BackThread () {
             while (!ShouldClose.Get ()) {
                 // recieve Data
-                if (connection.Client.Poll (200, SelectMode.SelectRead)) {
-                    String Line = reader.ReadLine ();
+                if (Connection.Client.Poll (200, SelectMode.SelectRead)) {
+                    String Line = Reader.ReadLine ();
                     Process (Line);
                 }
 
                 while (CommandQueue.ExecuteFunction (x => x.Count) > 0) {
                     Byte[] data = System.Text.Encoding.UTF8.GetBytes (CommandQueue.ExecuteFunction (x => x.Dequeue ()));
-                    stream.Write (data, 0, data.Length);
+                    NetStream.Write (data, 0, data.Length);
                 }
             }
-            Byte[] d2 = System.Text.Encoding.UTF8.GetBytes (String.Format ("QUIT {0}\r\n", config.QuitMessage));
-            stream.Write (d2, 0, d2.Length);
+            Byte[] d2 = System.Text.Encoding.UTF8.GetBytes (String.Format ("QUIT {0}\r\n", Configuration.QuitMessage));
+            NetStream.Write (d2, 0, d2.Length);
         }
 
         /// <summary>
@@ -57,10 +57,10 @@ namespace LibIRC {
             ServerMessageRegex = new System.Text.RegularExpressions.Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|]+) (.+)");
             PrivateMessageRegex = new System.Text.RegularExpressions.Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
 
-            connection = new TcpClient (config.Host, config.Port);
-            stream = connection.GetStream ();
-            reader = new StreamReader (stream);
-            this.config = config;
+            Connection = new TcpClient (config.Host, config.Port);
+            NetStream = Connection.GetStream ();
+            Reader = new StreamReader (NetStream);
+            this.Configuration = config;
 
             CommandQueue = new ThreadSafeObject<Queue<string>> (new Queue<string> ());
             ShouldClose = new ThreadSafeStruct<bool> (false);
@@ -68,8 +68,8 @@ namespace LibIRC {
             SendData (string.Format ("USER {0} * * {0}", config.Username));
             SendData (string.Format ("NICK {0}", config.Nick));
 
-            thread = new Thread ((ThreadStart) delegate { this.BackThread (); });
-            thread.Start ();
+            NetThread = new Thread ((ThreadStart) delegate { this.BackThread (); });
+            NetThread.Start ();
             Channels = new Dictionary<string, Channel> ();
 
         }
@@ -79,7 +79,7 @@ namespace LibIRC {
         /// </summary>
         public void Quit () {
             ShouldClose.Set (true);
-            thread.Join ();
+            NetThread.Join ();
         }
 
         /// <summary>

@@ -15,11 +15,11 @@ namespace LibIRC {
                 SendData (payload);
                 return; // no further processing required
             }
-            Match server = ServerMessageRegex.Match (Line);
-            Match priv = PrivateMessageRegex.Match (Line);
-            if (server.Success) {
+            Match Server = ServerMessageRegex.Match (Line);
+            Match Priv = PrivateMessageRegex.Match (Line);
+            if (Server.Success) {
                 Console.WriteLine ("Server Message: " + Line);
-                StatusCode status = (StatusCode) Convert.ToInt32 (server.Groups[2].Value);
+                StatusCode status = (StatusCode) Convert.ToInt32 (Server.Groups[2].Value);
                 switch (status) {
                     case StatusCode.Motd:
                         //add to motd string
@@ -29,7 +29,7 @@ namespace LibIRC {
                         break;
                 }
 
-            } else if (priv.Success) {
+            } else if (Priv.Success) {
                 Console.WriteLine ("Channel Message: " + Line);
             } else {
                 Console.WriteLine ("Unknown Message Type: " + Line);

@@ -10,7 +10,7 @@ namespace LibIRC {
         /// Represents A Channel or DM.static This has to be a child class to avoid exposing sending arbritary data
         /// </summary>
         public class Channel {
-            Client parent;
+            Client Parent;
 
             /// <summary>
             /// The Name of the Channel
@@ -19,15 +19,15 @@ namespace LibIRC {
 
             internal Channel (Client parent, String ChannelName) {
                 this.ChannelName = ChannelName;
-                this.parent = parent;
+                this.Parent = parent;
             }
 
             /// <summary>
             /// Sends a Message to the Channel
             /// </summary>
-            /// <param name="message">The Message To send</param>
-            public void SendMessage (String message) {
-                parent.SendData (String.Format ("PRIVMSG {0} :{1}", ChannelName, message));
+            /// <param name="Message">The Message To send</param>
+            public void SendMessage (String Message) {
+                Parent.SendData (String.Format ("PRIVMSG {0} :{1}", ChannelName, Message));
             }
         }
     }
