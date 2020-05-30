@@ -34,8 +34,6 @@ namespace LibIRC {
                 // recieve Data
                 if (connection.Client.Poll (200, SelectMode.SelectRead)) {
                     String Line = reader.ReadLine ();
-
-                    Console.WriteLine (Line);
                     Process (Line);
                 }
 

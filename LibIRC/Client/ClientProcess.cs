@@ -18,12 +18,21 @@ namespace LibIRC {
             Match server = ServerMessageRegex.Match (Line);
             Match priv = PrivateMessageRegex.Match (Line);
             if (server.Success) {
-                Console.WriteLine ("Server Message");
+                Console.WriteLine ("Server Message: " + Line);
+                StatusCode status = (StatusCode) Convert.ToInt32 (server.Groups[2].Value);
+                switch (status) {
+                    case StatusCode.Motd:
+                        //add to motd string
+                        break;
+                    default:
+                        Console.WriteLine (status.ToString ());
+                        break;
+                }
 
             } else if (priv.Success) {
-                Console.WriteLine ("Channel Message");
+                Console.WriteLine ("Channel Message: " + Line);
             } else {
-                Console.WriteLine ("Unknown Message Type");
+                Console.WriteLine ("Unknown Message Type: " + Line);
             }
         }
     }

@@ -2,9 +2,9 @@ using System;
 
 namespace LibIRC {
     /// <summary>
-    /// The Error Codes for IRC Taken from p43-55 of https://www.rfc-editor.org/rfc/rfc1459.txt
+    /// The Error/Status Codes for IRC Taken from p43-55 of https://www.rfc-editor.org/rfc/rfc1459.txt
     /// </summary>
-    public enum StatusCodes {
+    public enum StatusCode {
         /// <summary>
         /// Used to indicate the nickname parameter supplied to a command is currently unused.
         /// </summary>
