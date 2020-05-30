@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace LibIRC {
@@ -9,14 +10,24 @@ namespace LibIRC {
     /// <summary>
     /// A Class to connect to an IRC Server
     /// </summary>
-    public class Client {
+    public partial class Client {
+
+        // WebStream
         private TcpClient connection;
         private Stream stream;
         private StreamReader reader;
+        
+        private Config config;
+        private Dictionary<String, Channel> Channels;
+
+        // Threading
         private ThreadSafeStruct<bool> ShouldClose;
         private ThreadSafeObject<Queue<String>> CommandQueue;
         private Thread thread;
-        private Config config;
+
+        // Regex
+        Regex ServerMessageRegex;
+        Regex PrivateMessageRegex;
 
         private void BackThread () {
             while (!ShouldClose.Get ()) {
@@ -25,11 +36,7 @@ namespace LibIRC {
                     String Line = reader.ReadLine ();
 
                     Console.WriteLine (Line);
-                    if (Line.StartsWith ("PING ")) {
-                        String payload = "PONG " + Line.Substring (5);
-                        Console.WriteLine (payload);
-                        SendData (payload);
-                    }
+                    Process (Line);
                 }
 
                 while (CommandQueue.ExecuteFunction (x => x.Count) > 0) {
@@ -46,6 +53,12 @@ namespace LibIRC {
         /// </summary>
         /// <param name="config">The Configuration to use when connecting</param>
         public Client (Config config) {
+            // Initialise regex BEFORE we connect
+            // Nicks May Contain: 0-9A-Za-z_\-\[\]\{\}\\`\|
+            // Server May Contain A-Za-z.\-
+            ServerMessageRegex = new System.Text.RegularExpressions.Regex(@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
+            PrivateMessageRegex = new System.Text.RegularExpressions.Regex(@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
+
             connection = new TcpClient (config.Host, config.Port);
             stream = connection.GetStream ();
             reader = new StreamReader (stream);
@@ -59,6 +72,9 @@ namespace LibIRC {
 
             thread = new Thread ((ThreadStart) delegate { this.BackThread (); });
             thread.Start ();
+            Channels = new Dictionary<string, Channel> ();
+
+
         }
 
         /// <summary>
@@ -76,6 +92,15 @@ namespace LibIRC {
         protected void SendData (String Payload) {
             CommandQueue.ExecuteFunction (x => { x.Enqueue (Payload + "\r\n"); return 0; });
 
+        }
+
+        public Channel Join (String ChannelName) {
+            if (!Channels.ContainsKey (ChannelName)) {
+                Channel channel = new Channel (this, ChannelName);
+                SendData (String.Format ("JOIN {0}", ChannelName));
+                Channels[ChannelName] = channel;
+            }
+            return Channels[ChannelName];
         }
     }
 }
