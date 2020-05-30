@@ -31,7 +31,7 @@ namespace LibIRC {
         /// <summary>
         /// The Port to connect to
         /// </summary>
-        public int Port{get;set;}
+        public int Port { get; set; }
 
         /// <summary>
         /// Default Constructor, Will not set values

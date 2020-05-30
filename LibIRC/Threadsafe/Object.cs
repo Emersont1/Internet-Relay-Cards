@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 
 namespace LibIRC {
-    /// <summary>
+     /// <summary>
     /// A Class to wrap a class in a threadsafe way with a mutex
     /// </summary>
     /// <typeparam name="T">The type of class to be wrapped</typeparam>
@@ -31,7 +31,7 @@ namespace LibIRC {
         }
 
         /// <summary>
-        ///  Executes a Function/Lambda in a ThreadSafe manner
+        ///  Executes a Function/Lambda in a ThreadSafe manner. The lambda MUST return a value.
         /// </summary>
         /// <param name="Function">A Function </param>
         /// <typeparam name="U"> The Return type of <paramref name="Function"/> </typeparam>

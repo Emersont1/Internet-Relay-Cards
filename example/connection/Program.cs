@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using LibIRC;
 
 namespace connection {
     class Program {
         static void Main (string[] args) {
 
-            Config config = new Config();
+            Config config = new Config ();
             Console.WriteLine (config.ToJson ());
             config.Host = "et1.uk";
             config.UseSSL = false;

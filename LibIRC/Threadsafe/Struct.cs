@@ -49,7 +49,7 @@ namespace LibIRC {
         }
 
         /// <summary>
-        ///  Executes a Function/Lambda in a ThreadSafe manner
+        ///  Executes a Function/Lambda in a ThreadSafe manner. The lambda MUST return a value.
         /// </summary>
         /// <param name="Function">A Function </param>
         /// <typeparam name="U"> The Return type of <paramref name="Function"/> </typeparam>
