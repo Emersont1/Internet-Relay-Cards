@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26124.0
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibIRC", "LibIRC\LibIRC.csproj", "{FE807D9D-244E-49EC-8B91-F31E62963BEC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{CF922AB9-C7BF-4352-B6D0-6AAD6BFE2059}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "connection", "example\connection\connection.csproj", "{C737E266-FD34-4940-8393-39F00D3E69C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Debug|x64.Build.0 = Debug|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Debug|x86.Build.0 = Debug|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Release|x64.ActiveCfg = Release|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Release|x64.Build.0 = Release|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Release|x86.ActiveCfg = Release|Any CPU
+		{FE807D9D-244E-49EC-8B91-F31E62963BEC}.Release|x86.Build.0 = Release|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Debug|x64.Build.0 = Debug|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Release|x64.ActiveCfg = Release|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Release|x64.Build.0 = Release|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{C737E266-FD34-4940-8393-39F00D3E69C9}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C737E266-FD34-4940-8393-39F00D3E69C9} = {CF922AB9-C7BF-4352-B6D0-6AAD6BFE2059}
+	EndGlobalSection
+EndGlobal
