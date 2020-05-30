@@ -34,6 +34,11 @@ namespace LibIRC {
         public int Port { get; set; }
 
         /// <summary>
+        /// The Message to display when the client quits
+        /// </summary>
+        public string QuitMessage { get; set; }
+
+        /// <summary>
         /// Default Constructor, Will not set values
         /// </summary>
         public Config () { }
