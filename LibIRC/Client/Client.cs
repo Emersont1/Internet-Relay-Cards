@@ -32,7 +32,7 @@ namespace LibIRC {
         private void BackThread () {
             while (!ShouldClose.Get ()) {
                 // recieve Data
-                if (connection.Client.Poll (2000, SelectMode.SelectRead)) {
+                if (connection.Client.Poll (200, SelectMode.SelectRead)) {
                     String Line = reader.ReadLine ();
 
                     Console.WriteLine (Line);
@@ -56,8 +56,8 @@ namespace LibIRC {
             // Initialise regex BEFORE we connect
             // Nicks May Contain: 0-9A-Za-z_\-\[\]\{\}\\`\|
             // Server May Contain A-Za-z.\-
-            ServerMessageRegex = new System.Text.RegularExpressions.Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
-            PrivateMessageRegex = new System.Text.RegularExpressions.Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
+            ServerMessageRegex = new System.Text.RegularExpressions.Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|]+) (.+)");
+            PrivateMessageRegex = new System.Text.RegularExpressions.Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
 
             connection = new TcpClient (config.Host, config.Port);
             stream = connection.GetStream ();
