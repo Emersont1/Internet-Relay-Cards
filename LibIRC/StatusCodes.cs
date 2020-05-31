@@ -5,6 +5,11 @@ namespace LibIRC {
     /// The Error/Status Codes for IRC Taken from p43-55 of https://www.rfc-editor.org/rfc/rfc1459.txt
     /// </summary>
     public enum StatusCode {
+        ///<summary>
+        /// Welcome Message Sent By Server
+        /// </summary>
+        Welcome = 001,
+        
         /// <summary>
         /// Used to indicate the nickname parameter supplied to a command is currently unused.
         /// </summary>

@@ -17,9 +17,9 @@ namespace LibIRC {
             /// </summary>
             public String ChannelName { get; private set; }
 
-            internal Channel (Client parent, String ChannelName) {
+            internal Channel (Client Parent, String ChannelName) {
                 this.ChannelName = ChannelName;
-                this.Parent = parent;
+                this.Parent = Parent;
             }
 
             /// <summary>

@@ -22,6 +22,7 @@ namespace LibIRC {
 
         // Threading
         private ThreadSafeStruct<bool> ShouldClose;
+        private ThreadSafeStruct<bool> Had001;
         private ThreadSafeObject<Queue<String>> CommandQueue;
         private Thread NetThread;
 
@@ -31,8 +32,9 @@ namespace LibIRC {
 
         private void BackThread () {
             while (!ShouldClose.Get ()) {
-                // recieve Data
-                if (Connection.Client.Poll (200, SelectMode.SelectRead)) {
+                
+                SpinWait.SpinUntil(()=>CommandQueue.ExecuteFunction (x => x.Count) > 0 || Connection.Available > 0 );
+                if ( Connection.Available > 0) {
                     String Line = Reader.ReadLine ();
                     Process (Line);
                 }
@@ -49,29 +51,35 @@ namespace LibIRC {
         /// <summary>
         /// A class used to connect to an IRC server
         /// </summary>
-        /// <param name="config">The Configuration to use when connecting</param>
-        public Client (Config config) {
+        /// <param name="Configuration">The Configuration to use when connecting</param>
+        public Client (Config Configuration) {
             // Initialise regex BEFORE we connect
             // Nicks May Contain: 0-9A-Za-z_\-\[\]\{\}\\`\|
             // Server May Contain A-Za-z.\-
-            ServerMessageRegex = new System.Text.RegularExpressions.Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|]+) (.+)");
-            PrivateMessageRegex = new System.Text.RegularExpressions.Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.+)");
+            ServerMessageRegex = new System.Text.RegularExpressions.Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|\*]+) (.+)");
+            PrivateMessageRegex = new System.Text.RegularExpressions.Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.*)");
 
-            Connection = new TcpClient (config.Host, config.Port);
+            Connection = new TcpClient (Configuration.Host, Configuration.Port);
+            Connection.NoDelay = true;
             NetStream = Connection.GetStream ();
             Reader = new StreamReader (NetStream);
-            this.Configuration = config;
+            this.Configuration = Configuration;
 
             CommandQueue = new ThreadSafeObject<Queue<string>> (new Queue<string> ());
             ShouldClose = new ThreadSafeStruct<bool> (false);
 
-            SendData (string.Format ("USER {0} * * {0}", config.Username));
-            SendData (string.Format ("NICK {0}", config.Nick));
+            SendData (string.Format ("USER {0} * * {0}", Configuration.Username));
+            SendData (string.Format ("NICK {0}", Configuration.Nick));
 
             NetThread = new Thread ((ThreadStart) delegate { this.BackThread (); });
-            NetThread.Start ();
             Channels = new Dictionary<string, Channel> ();
 
+            Had001 = new ThreadSafeStruct<bool>(false);
+
+            // Start Thread
+            NetThread.Start ();
+            // Wait for 001;
+            SpinWait.SpinUntil(()=>Had001.Get());
         }
 
         /// <summary>
