@@ -33,9 +33,9 @@ namespace LibIRC {
 
         private void BackThread () {
             while (!ShouldClose.Get ()) {
-                
-                SpinWait.SpinUntil(()=>CommandQueue.ExecuteFunction (x => x.Count) > 0 || Connection.Available > 0 );
-                if ( Connection.Available > 0) {
+
+                SpinWait.SpinUntil (() => CommandQueue.ExecuteFunction (x => x.Count) > 0 || Connection.Available > 0);
+                if (Connection.Available > 0) {
                     String Line = Reader.ReadLine ();
                     Process (Line);
                 }
@@ -55,12 +55,9 @@ namespace LibIRC {
         /// <param name="Configuration">The Configuration to use when connecting</param>
         public Client (Config Configuration) {
             // Initialise regex BEFORE we connect
-            // Nicks May Contain: 0-9A-Za-z_\-\[\]\{\}\\`\|
-            // Server May Contain A-Za-z.\-
             ServerMessageRegex = new Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|\*]+) (.+)");
             PrivateMessageRegex = new Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.*)");
-            JoinConfirmRegex = new Regex(@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) JOIN :#(.*)");
-
+            JoinConfirmRegex = new Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) JOIN :(#.+)");
 
             Connection = new TcpClient (Configuration.Host, Configuration.Port);
             Connection.NoDelay = true;
@@ -77,12 +74,12 @@ namespace LibIRC {
             NetThread = new Thread ((ThreadStart) delegate { this.BackThread (); });
             Channels = new Dictionary<string, Channel> ();
 
-            Had001 = new ThreadSafeStruct<bool>(false);
+            Had001 = new ThreadSafeStruct<bool> (false);
 
             // Start Thread
             NetThread.Start ();
             // Wait for 001;
-            SpinWait.SpinUntil(()=>Had001.Get());
+            SpinWait.SpinUntil (() => Had001.Get ());
         }
 
         /// <summary>
@@ -110,10 +107,15 @@ namespace LibIRC {
         public Channel Join (String ChannelName) {
             if (!Channels.ContainsKey (ChannelName)) {
                 Channel channel = new Channel (this, ChannelName);
-                SendData (String.Format ("JOIN {0}", ChannelName));
                 Channels[ChannelName] = channel;
+                SendData (String.Format ("JOIN {0}", ChannelName));
+                SpinWait.SpinUntil (() => channel.Response != StatusCode.None);
+                if (channel.Response == StatusCode.JOIN) { return channel; }
+                Channels.Remove (ChannelName);
+                throw new IrcException (channel.Response);
+            } else {
+                return Channels[ChannelName];
             }
-            return Channels[ChannelName];
         }
     }
 }

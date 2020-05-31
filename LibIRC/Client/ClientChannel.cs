@@ -11,6 +11,7 @@ namespace LibIRC {
         /// </summary>
         public class Channel {
             Client Parent;
+            internal StatusCode Response;
 
             /// <summary>
             /// The Name of the Channel
@@ -20,6 +21,7 @@ namespace LibIRC {
             internal Channel (Client Parent, String ChannelName) {
                 this.ChannelName = ChannelName;
                 this.Parent = Parent;
+                Response = StatusCode.None;
             }
 
             /// <summary>

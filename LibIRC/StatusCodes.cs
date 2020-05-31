@@ -9,7 +9,7 @@ namespace LibIRC {
         /// Welcome Message Sent By Server
         /// </summary>
         Welcome = 001,
-        
+
         /// <summary>
         /// Used to indicate the nickname parameter supplied to a command is currently unused.
         /// </summary>
@@ -617,5 +617,9 @@ namespace LibIRC {
         ///</summary>
         AdminEmail = 259,
 
+        ///<summary>
+        /// (Hopefully a server should not return this) Status Code to be denote that the channel has been successfully joined
+        ///</summary>
+        JOIN = 1025,
     }
 }
