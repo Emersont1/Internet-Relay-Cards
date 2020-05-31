@@ -29,6 +29,7 @@ namespace LibIRC {
         // Regex
         Regex ServerMessageRegex;
         Regex PrivateMessageRegex;
+        Regex JoinConfirmRegex;
 
         private void BackThread () {
             while (!ShouldClose.Get ()) {
@@ -56,8 +57,10 @@ namespace LibIRC {
             // Initialise regex BEFORE we connect
             // Nicks May Contain: 0-9A-Za-z_\-\[\]\{\}\\`\|
             // Server May Contain A-Za-z.\-
-            ServerMessageRegex = new System.Text.RegularExpressions.Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|\*]+) (.+)");
-            PrivateMessageRegex = new System.Text.RegularExpressions.Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.*)");
+            ServerMessageRegex = new Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|\*]+) (.+)");
+            PrivateMessageRegex = new Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.*)");
+            JoinConfirmRegex = new Regex(@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) JOIN :#(.*)");
+
 
             Connection = new TcpClient (Configuration.Host, Configuration.Port);
             Connection.NoDelay = true;

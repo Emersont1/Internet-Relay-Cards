@@ -14,6 +14,7 @@ namespace LibIRC {
             }
             Match Server = ServerMessageRegex.Match (Line);
             Match Priv = PrivateMessageRegex.Match (Line);
+            Match JoinConfirm = JoinConfirmRegex.Match(Line);
             if (Server.Success) {
                 //Console.WriteLine ("Server Message: " + Line);
                 StatusCode status = (StatusCode) Convert.ToInt32 (Server.Groups[2].Value);
@@ -37,6 +38,8 @@ namespace LibIRC {
 
             } else if (Priv.Success) {
                 Console.WriteLine ("{0} {1} {2}", Priv.Groups[4].Value, Priv.Groups[1].Value, Priv.Groups[5].Value);
+            } else if (JoinConfirm.Success) {
+                Console.WriteLine ("Joined #{0}", JoinConfirm.Groups[4].Value);
             } else {
                 Console.WriteLine ("Unknown Message Type: " + Line);
             }
