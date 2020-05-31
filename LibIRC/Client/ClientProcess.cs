@@ -49,7 +49,12 @@ namespace LibIRC {
                 }
 
             } else if (Priv.Success) {
-                Console.WriteLine ("{0} {1} {2}", Priv.Groups[4].Value, Priv.Groups[1].Value, Priv.Groups[5].Value);
+                if (Priv.Groups[4].Value.StartsWith ("#")) { // Channel
+                    Message message = new Message (Priv.Groups[1].Value, Priv.Groups[5].Value);
+                    Channels[Priv.Groups[4].Value].MessageQueue.ExecuteFunction (q => { q.Enqueue (message); return 0; });
+                } else { // DM
+
+                }
             } else if (JoinConfirm.Success) {
                 Channels[JoinConfirm.Groups[4].Value].Response = StatusCode.JOIN;
             } else {

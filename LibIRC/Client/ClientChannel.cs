@@ -12,6 +12,7 @@ namespace LibIRC {
         public class Channel {
             Client Parent;
             internal StatusCode Response;
+            internal ThreadSafeObject<Queue<Message>> MessageQueue;
 
             /// <summary>
             /// The Name of the Channel
@@ -22,6 +23,7 @@ namespace LibIRC {
                 this.ChannelName = ChannelName;
                 this.Parent = Parent;
                 Response = StatusCode.None;
+                MessageQueue = new ThreadSafeObject<Queue<Message>> (new Queue<Message> ());
             }
 
             /// <summary>

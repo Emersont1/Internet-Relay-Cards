@@ -15,11 +15,12 @@ namespace connection {
             config.QuitMessage = "Test Shutdown";
 
             Client client = new Client (config);
-            for(int i =0; i< 20; i++){
+            /*for(int i =0; i< 20; i++){
             Client.Channel channel = client.Join (String.Format("#{0}", i));
                    channel.SendMessage (String.Format("Line{0}", i));
-            }
-            /*
+            }*/
+
+            Client.Channel channel = client.Join ("#test");
             while (true) {
                 String Line = Console.ReadLine ();
                 if (Line == "QUIT")
@@ -28,7 +29,7 @@ namespace connection {
                     channel.SendMessage (Line);
 
             }
-            */
+
             client.Quit ();
             Console.WriteLine (config.ToJson ());
         }
