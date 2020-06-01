@@ -8,6 +8,22 @@ using System.Threading;
 namespace LibIRC {
 
     /// <summary>
+    /// Class to Represent a Direct Message
+    /// </summary>
+    public class DirectMessage {
+
+        /// <summary>
+        /// The Sender of the Message
+        /// </summary>
+        public string From;
+
+        /// <summary>
+        /// The Content of the Message
+        /// </summary>
+        public string Content;
+    }
+
+    /// <summary>
     /// A Class to connect to an IRC Server
     /// </summary>
     public partial class Client {
@@ -19,7 +35,7 @@ namespace LibIRC {
 
         private Config Configuration;
         private Dictionary<String, Channel> Channels;
-        private ThreadSafeObject<Dictionary<string, Queue<String>>> DirectMessages;
+        private ThreadSafeObject<Queue<DirectMessage>> DirectMessages;
 
         // Threading
         private ThreadSafeStruct<bool> ShouldClose;
@@ -72,7 +88,7 @@ namespace LibIRC {
 
             NetThread = new Thread ((ThreadStart) delegate { this.BackThread (); });
             Channels = new Dictionary<string, Channel> ();
-            DirectMessages = new ThreadSafeObject<Dictionary<string, Queue<string>>> (new Dictionary<string, Queue<string>> ());
+            DirectMessages = new ThreadSafeObject<Queue<DirectMessage>> (new Queue<DirectMessage> ());
 
             Had001 = new ThreadSafeStruct<bool> (false);
 
@@ -118,5 +134,27 @@ namespace LibIRC {
             }
         }
 
+        /// <summary>
+        /// Sends a DM
+        /// </summary>
+        /// <param name="User">The User to send the message to</param>
+        /// <param name="Message">The Message To Send</param>
+        public void SendDM (String User, String Message) {
+            SendData (String.Format ("PRIVMSG {0} :{1}", User, Message));
+        }
+
+        /// <summary>
+        /// Wether There are DMs to process
+        /// </summary>
+        public bool HasDirectMessages () {
+            return DirectMessages.ExecuteFunction (x => x.Count > 0);
+        }
+
+        /// <summary>
+        /// Gets the First Queued DM
+        /// </summary>
+        public DirectMessage GetDirectMessage () {
+            return DirectMessages.ExecuteFunction (x => x.Dequeue ());
+        }
     }
 }

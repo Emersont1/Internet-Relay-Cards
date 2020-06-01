@@ -89,20 +89,19 @@ namespace LibIRC {
                             SendData (String.Format ("NAMES {0}", ChannelName));
                             break;
                         case Command.PRIVMSG:
-                            Match Priv= Regex.Match(TextCommand.Groups[5].Value, @"(\S+) :(.+)");
+                            Match Priv = Regex.Match (TextCommand.Groups[5].Value, @"(\S+) :(.+)");
                             if (Priv.Groups[1].Value.StartsWith ("#")) { // Channel
-                                        Message message = new Message (TextCommand.Groups[1].Value, Priv.Groups[2].Value);
-                                        Channels[Priv.Groups[1].Value].MessageQueue.ExecuteFunction (q => { q.Enqueue (message); return 0; });
-                                    } else { // DM
-                                        DirectMessages.ExecuteFunction (x => {
-                                            if (!x.ContainsKey (TextCommand.Groups[1].Value)) {
-                                                x[TextCommand.Groups[1].Value] = new Queue<string> ();
-                                            }
-                                            Console.WriteLine (TextCommand.Groups[1].Value);
-                                            x[TextCommand.Groups[1].Value].Enqueue (Priv.Groups[2].Value);
-                                            return 0;
-                                        });
-                                    }            
+                                Message message = new Message (TextCommand.Groups[1].Value, Priv.Groups[2].Value);
+                                Channels[Priv.Groups[1].Value].MessageQueue.ExecuteFunction (q => { q.Enqueue (message); return 0; });
+                            } else { // DM
+                                DirectMessages.ExecuteFunction (x => {
+                                    DirectMessage DM = new DirectMessage ();
+                                    DM.Content = Priv.Groups[2].Value;
+                                    DM.From = TextCommand.Groups[1].Value;
+                                    x.Enqueue (DM);
+                                    return 0;
+                                });
+                            }
                             break;
                         default:
                             Console.WriteLine ("Unhandled {0} Command", TextCommand.Groups[4].Value);

@@ -1,0 +1,7 @@
+{
+    "Host":"et1.uk",
+    "UseSSL":false,
+    "Username":"et1",
+    "Nick":"bobbybot",
+    "Port":6667
+}
