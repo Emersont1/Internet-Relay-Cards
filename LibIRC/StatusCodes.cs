@@ -618,7 +618,7 @@ namespace LibIRC {
         AdminEmail = 259,
 
         ///<summary>
-        /// (Hopefully a server should not return this) Status Code to be denote that the channel has been successfully joined
+        /// (Hopefully a server should not return this numerically) Command Notifying of a user joining
         ///</summary>
         JOIN = 1025,
     }

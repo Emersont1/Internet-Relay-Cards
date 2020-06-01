@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using LibIRC;
 
 namespace connection {
@@ -20,13 +21,39 @@ namespace connection {
                    channel.SendMessage (String.Format("Line{0}", i));
             }*/
 
-            Client.Channel channel = client.Join ("#test");
+            Client.Channel channel = client.Join ("##c++");
+
+            String Line = "";
+            bool newline = false;
             while (true) {
-                String Line = Console.ReadLine ();
-                if (Line == "QUIT")
-                    break;
-                else
-                    channel.SendMessage (Line);
+                SpinWait.SpinUntil (() => channel.CanGetMessage () || Console.KeyAvailable);
+
+                while (channel.CanGetMessage ()) {
+                    Console.WriteLine (channel.GetMessage ().MessageText);
+                }
+
+                while (Console.KeyAvailable) {
+                    ConsoleKeyInfo c = Console.ReadKey ();
+                    if (c.Key == ConsoleKey.Enter) {
+                        newline = true;
+                        foreach (String s in channel.Users) {
+                            Console.WriteLine (s);
+                        }
+                    } else {
+                        Line += c.KeyChar;
+                    }
+                }
+                if (newline) {
+                    if (Line == "QUIT") {
+                        break;
+                    } else {
+                        channel.SendMessage (Line);
+                        Console.WriteLine (Line);
+                    }
+                    Line = "";
+                    newline = false;
+
+                }
 
             }
 

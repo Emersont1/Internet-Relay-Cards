@@ -19,6 +19,7 @@ namespace LibIRC {
 
         private Config Configuration;
         private Dictionary<String, Channel> Channels;
+        private ThreadSafeObject<Dictionary<string, Queue<String>>> DirectMessages;
 
         // Threading
         private ThreadSafeStruct<bool> ShouldClose;
@@ -28,8 +29,7 @@ namespace LibIRC {
 
         // Regex
         Regex ServerMessageRegex;
-        Regex PrivateMessageRegex;
-        Regex JoinConfirmRegex;
+        Regex CommandRegex;
 
         private void BackThread () {
             while (!ShouldClose.Get ()) {
@@ -56,8 +56,7 @@ namespace LibIRC {
         public Client (Config Configuration) {
             // Initialise regex BEFORE we connect
             ServerMessageRegex = new Regex (@":([A-Za-z0-9\.\-]+) ([0-9]+) ([0-9A-Za-z_\-\[\]\{\}\\`\|\*]+) (.+)");
-            PrivateMessageRegex = new Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) PRIVMSG ([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :(.*)");
-            JoinConfirmRegex = new Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:]+) JOIN :(#.+)");
+            CommandRegex = new Regex (@":([0-9A-Za-z_\-\[\]\{\}\\`\|]+)!~([0-9A-Za-z_\-\[\]\{\}\\`\|]+)@([A-Za-z0-9\.\-:\/]+) ([A-Z]+) (.+)");
 
             Connection = new TcpClient (Configuration.Host, Configuration.Port);
             Connection.NoDelay = true;
@@ -73,6 +72,7 @@ namespace LibIRC {
 
             NetThread = new Thread ((ThreadStart) delegate { this.BackThread (); });
             Channels = new Dictionary<string, Channel> ();
+            DirectMessages = new ThreadSafeObject<Dictionary<string, Queue<string>>> (new Dictionary<string, Queue<string>> ());
 
             Had001 = new ThreadSafeStruct<bool> (false);
 
@@ -117,5 +117,6 @@ namespace LibIRC {
                 return Channels[ChannelName];
             }
         }
+
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -12,18 +13,18 @@ namespace LibIRC {
                 SendData (payload);
                 return; // no further processing required
             }
-            Match Server = ServerMessageRegex.Match (Line);
-            Match Priv = PrivateMessageRegex.Match (Line);
-            Match JoinConfirm = JoinConfirmRegex.Match (Line);
-            if (Server.Success) {
+            Match NumCommand = ServerMessageRegex.Match (Line);
+            Match TextCommand = CommandRegex.Match (Line);
+            if (NumCommand.Success) {
                 //Console.WriteLine ("Server Message: " + Line);
-                StatusCode status = (StatusCode) Convert.ToInt32 (Server.Groups[2].Value);
+                StatusCode status = (StatusCode) Convert.ToInt32 (NumCommand.Groups[2].Value);
+                Match R;
                 switch (status) {
                     case StatusCode.Welcome:
                         Had001.Set (true);
                         break;
                     case StatusCode.Motd:
-                        Console.WriteLine (Server.Groups[4].Value);
+                        Console.WriteLine (NumCommand.Groups[4].Value);
                         //add to motd string
                         break;
                     case StatusCode.NicknameInUse:
@@ -38,25 +39,79 @@ namespace LibIRC {
                     case StatusCode.BannedFromChannel:
                     case StatusCode.BadChannelKey:
                     case StatusCode.NoPrivileges:
-                        String channel = Regex.Match (Server.Groups[4].Value, @"([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :.+").Groups[1].Value;
+                        String channel = Regex.Match (NumCommand.Groups[4].Value, @"([#0-9A-Za-z_\-\[\]\{\}\\`\|]+) :.+").Groups[1].Value;
                         if (Channels.ContainsKey (channel)) {
-                            Channels[channel].Response = StatusCode.TooManyChannels;
+                            Channels[channel].Response = status;
                         }
                         break;
+                    case StatusCode.EndOfNames:
+
+                        R = Regex.Match (NumCommand.Groups[4].Value, @"([#0-9A-Za-z_\-\[\]\{\}\\`\|\+]+) :(.+)");
+                        if (Channels.ContainsKey (R.Groups[1].Value)) {
+                            Channels[R.Groups[1].Value].EndOfNames = true;
+                        }
+                        break;
+                    case StatusCode.NamReply:
+
+                        R = Regex.Match (NumCommand.Groups[4].Value, @". ([#0-9A-Za-z_\-\[\]\{\}\\`\|\+]+) :(.+)");
+                        if (Channels.ContainsKey (R.Groups[1].Value)) {
+                            if (Channels[R.Groups[1].Value].EndOfNames) {
+                                Channels[R.Groups[1].Value].EndOfNames = false;
+                                Channels[R.Groups[1].Value].Inside_Users.Clear ();
+                            }
+                            foreach (String name in R.Groups[2].Value.Split (null)) {
+                                Channels[R.Groups[1].Value].Inside_Users.Add (name);
+                            }
+                        }
+                        break;
+
                     default:
-                        Console.WriteLine ("{0}: {1}", status.ToString (), Server.Groups[4].Value);
+                        Console.WriteLine ("{0}: {1}", status.ToString (), NumCommand.Groups[4].Value);
                         break;
                 }
 
-            } else if (Priv.Success) {
-                if (Priv.Groups[4].Value.StartsWith ("#")) { // Channel
-                    Message message = new Message (Priv.Groups[1].Value, Priv.Groups[5].Value);
-                    Channels[Priv.Groups[4].Value].MessageQueue.ExecuteFunction (q => { q.Enqueue (message); return 0; });
-                } else { // DM
+            } else if (TextCommand.Success) {
+                try {
+                    Command c = (Command) Enum.Parse (typeof (Command), TextCommand.Groups[4].Value);
+                    switch (c) {
+                        case Command.JOIN:
+                            String ChannelName = TextCommand.Groups[5].Value;
+                            if (ChannelName.StartsWith (":")) {
+                                ChannelName = ChannelName.Substring (1);
+                            }
+                            if (TextCommand.Groups[1].Value == Configuration.Nick) {
 
+                                Channels[ChannelName].Response = StatusCode.JOIN;
+
+                            } else {
+                                Console.WriteLine (TextCommand.Groups[1].Value);
+                            }
+                            SendData (String.Format ("NAMES {0}", ChannelName));
+                            break;
+                        case Command.PRIVMSG:
+                            Match Priv= Regex.Match(TextCommand.Groups[5].Value, @"(\S+) :(.+)");
+                            if (Priv.Groups[1].Value.StartsWith ("#")) { // Channel
+                                        Message message = new Message (TextCommand.Groups[1].Value, Priv.Groups[2].Value);
+                                        Channels[Priv.Groups[1].Value].MessageQueue.ExecuteFunction (q => { q.Enqueue (message); return 0; });
+                                    } else { // DM
+                                        DirectMessages.ExecuteFunction (x => {
+                                            if (!x.ContainsKey (TextCommand.Groups[1].Value)) {
+                                                x[TextCommand.Groups[1].Value] = new Queue<string> ();
+                                            }
+                                            Console.WriteLine (TextCommand.Groups[1].Value);
+                                            x[TextCommand.Groups[1].Value].Enqueue (Priv.Groups[2].Value);
+                                            return 0;
+                                        });
+                                    }            
+                            break;
+                        default:
+                            Console.WriteLine ("Unhandled {0} Command", TextCommand.Groups[4].Value);
+                            break;
+
+                    }
+                } catch (ArgumentException) {
+                    Console.WriteLine ("Unrecognised {0} Command", TextCommand.Groups[4].Value);
                 }
-            } else if (JoinConfirm.Success) {
-                Channels[JoinConfirm.Groups[4].Value].Response = StatusCode.JOIN;
             } else {
                 Console.WriteLine ("Unknown Message Type: " + Line);
             }
